@@ -10,7 +10,10 @@ def normalize_cols(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     out = df.copy()
     for c in cols:
         if c in out:
-            x = out[c]
-            mu, sigma = x.mean(), x.std() or 1.0
+            x = out[c].astype(float)
+            mu = float(x.mean())
+            sigma = float(x.std(ddof=0))  # use population std so normalized std ≈ 1.0
+            if sigma == 0.0 or np.isnan(sigma):
+                sigma = 1.0
             out[c] = (x - mu) / sigma
     return out
