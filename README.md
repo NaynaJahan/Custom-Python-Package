@@ -1,15 +1,17 @@
-# Utilities & baselines for the Advanced Machine Learning Application AT1 AT1 - Kaggle Competition
+# Custom Python Package - Utilities & baselines 
 
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
 ## Project description
-`amla_at1` is a lightweight Python package that bundles **data utilities**, **feature-engineering helpers**, **baseline models**, and **evaluation helpers** used in the AMLA AT1 Kaggle Competition. It includes:
-- A simple **NullModel** baseline with `fit()` / `predict_proba()` that returns calibrated constant probabilities.
-- **Performance helpers** to compute AUROC, Brier score, and to ensemble multiple probability vectors.
-- **Feature engineering** for the draft dataset (height parsing, year ordinal, type flags, shooting ratios, per-minute rates), which are relevant and important features of the project.
-- **Dataset helpers** to pop the target, save/load splits, and run a stratified train/validation/test split.
+`amla_at1` is a lightweight Python package that bundles **data utilities**, **feature-engineering helpers**, **baseline models**, and **evaluation helpers**. It includes:
+- **Data utils**: train/val/test splits, date-based splits, save/load sets.
+- **Weather I/O**: Open-Meteo historical API wrapper for Sydney
+- **Feature engineering**: calendar & ratios (draft dataset), weather cleaning/normalization
+- **Baselines & metrics**: a constant-probability model, AUROC/Brier, extra cls/reg scores
+- **Model export**: convenience function for saving model + metadata
+- Used by your AMLA AT1 and AT2 experimentation repo to train models, and by the FastAPI repo to serve predictions.
 
 The package is tested via `pytest` and designed to be imported directly in notebooks or Python scripts. The classes and functions are assessed using these test cases. 
 
@@ -17,32 +19,44 @@ The package is tested via `pytest` and designed to be imported directly in noteb
 
 ## Project Structure
 
-```
+```markdown
+
 amla_at1_python_pkg/
 ├─ src/
-│ └─ amla_at1/
-│   ├─ __init__.py
-│   ├─ data/
-│   │    └─ __init__.py
-|   |    └─ sets.py
-│   ├─ features/
-│   │    └─ __init__.py
-|   |    └─ dates.py
-│   ├─ models/
-│   |    ├─ __init__.py
-│   |    ├─ null.py
-|   └─———└─ performance.py
+│  └─ amla_at1/
+│     ├─ __init__.py
+│     ├─ data/
+│     │  ├─ __init__.py
+│     │  ├─ sets.py
+│     │  ├─ openmeteo.py
+│     │  └─ time_split.py
+│     ├─ features/
+│     │  ├─ __init__.py
+│     │  ├─ dates.py
+│     │  └─ weather.py
+│     └─ models/
+│        ├─ __init__.py
+│        ├─ null.py
+│        ├─ performance.py
+│        ├─ export.py
+│        └─ metrics_extra.py
 ├─ tests/
-│ ├─ data/
-| |    └─ test_sets.py
-│ ├─ features/
-| |    └─ test_dates.py
-│ ├─ models/
-│ |    ├─ test_null.py
-| |    └─ test_performance.py
-│ └─ test_data.py
+│  ├─ data/
+│  │  ├─ test_openmeteo.py
+│  │  ├─ test_time_split.py
+│  │  └─ test_sets.py
+│  ├─ features/
+│  │  ├─ test_weather.py
+│  │  └─ test_dates.py
+│  └─ models/
+│  │  ├─ test_metrics_export.py
+│  │  ├─ test_null.py
+│  │  └─ test_performance.py
+│  ├─ __init__.py
+│  └─ test_data.py
 ├─ pyproject.toml
 └─ README.md
+
 ```
 
 --------
@@ -63,35 +77,39 @@ amla_at1_python_pkg/
    ```bash
    git clone https://github.com/naynajn/amla_at1_python_pkg.git
    cd amla_at1_python_pkg
+   ```
 ---
 
 2. **Pin Python 3.11.4 with pyenv**
    ```bash
     pyenv install 3.11.4
     pyenv local 3.11.4
-
+   ```
 ---
 
 3. **Install dependencies with Poetry**
    ```bash
    poetry install
+   ```
 ---
 
 4. **Activate the virtual environment**
    ```bash
    poetry shell
+   ```
 
 ---
 
 5. **Run the test suite**
    ```bash
    pytest -q
-
+   ```
 ---
 
 6. **(Optional) Launch Jupyter Lab / Notebook**
    ```bash
    poetry run jupyter lab
+   ```
 
 ---
 
@@ -99,16 +117,24 @@ amla_at1_python_pkg/
    ```bash
    from amla_at1.features.dates import add_domain_features
    from amla_at1.models.performance import metrics_from_proba
+   from amla_at1.data.openmeteo import fetch_daily_archive, make_supervised_tables
+   from amla_at1.data.time_split import split_by_date
+   from amla_at1.features.weather import clip_and_fill, normalize_cols
+   from amla_at1.models.metrics_extra import cls_scores
+   from amla_at1.models.export import save_model
+   from amla_at1.data import save_sets
+   ```
 ---
 
 ### Installing from TestPyPI
-   ```
-   bash
-   pip install -i https://test.pypi.org/simple/ amla-at1
-   import amla_at1
+   ```bash
+   pip install --extra-index-url https://test.pypi.org/simple/ amla-at1==2025.0.2.0
    ```
 ---
 
 ### Versioning & releases
 - Version and metadata are managed in pyproject.toml.
 - Use poetry version <patch|minor|major> to bump versions, then poetry build and poetry publish.
+
+### Attribution
+- [Open-Meteo Historical Weather API](https://open-meteo.com/en/docs/historical-weather-api#json_return_object)
