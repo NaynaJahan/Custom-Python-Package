@@ -8,10 +8,11 @@
 `amla_at1` is a lightweight Python package that bundles **data utilities**, **feature-engineering helpers**, **baseline models**, and **evaluation helpers**. It includes:
 - **Data utils**: train/val/test splits, date-based splits, save/load sets.
 - **Weather I/O**: Open-Meteo historical API wrapper for Sydney
+- **Crypto utilities**: Fetches the latest Ethereum OHLC data from Kraken / CoinGecko, prepares historical/engineered features, builds supervised data to predict next_day_high.
 - **Feature engineering**: calendar & ratios (draft dataset), weather cleaning/normalization
 - **Baselines & metrics**: a constant-probability model, AUROC/Brier, extra cls/reg scores
 - **Model export**: convenience function for saving model + metadata
-- Used by your AMLA AT1 and AT2 experimentation repo to train models, and by the FastAPI repo to serve predictions.
+- Used by Advanced Machine Learning Application's Assignment 1, Assignment 2 and Assignment 3 experimentation repo to train models, and by the FastAPI repositories of Assignment 2 and Assignment 3 to serve predictions.
 
 The package is tested via `pytest` and designed to be imported directly in notebooks or Python scripts. The classes and functions are assessed using these test cases. 
 
@@ -25,6 +26,11 @@ amla_at1_python_pkg/
 ├─ src/
 │  └─ amla_at1/
 │     ├─ __init__.py
+│     ├─ crypto/
+│     │  ├─ __init__.py
+│     │  ├─ etl.py
+│     │  ├─ features.py
+│     │  └─ ohlc_api.py
 │     ├─ data/
 │     │  ├─ __init__.py
 │     │  ├─ sets.py
@@ -41,6 +47,10 @@ amla_at1_python_pkg/
 │        ├─ export.py
 │        └─ metrics_extra.py
 ├─ tests/
+│  ├─ crypto/
+│  │  ├─ test_etl.py
+│  │  ├─ test_export_load.py
+│  │  └─ test_features.py
 │  ├─ data/
 │  │  ├─ test_openmeteo.py
 │  │  ├─ test_time_split.py
@@ -53,6 +63,7 @@ amla_at1_python_pkg/
 │  │  ├─ test_null.py
 │  │  └─ test_performance.py
 │  ├─ __init__.py
+│  ├─ conftest.py
 │  └─ test_data.py
 ├─ pyproject.toml
 └─ README.md
@@ -123,12 +134,14 @@ amla_at1_python_pkg/
    from amla_at1.models.metrics_extra import cls_scores
    from amla_at1.models.export import save_model
    from amla_at1.data import save_sets
+   from amla_at1.crypto.etl import load_local_history_csvs, build_nextday_high_supervised, latest_feature_row
+   from amla_at1.crypto.ohlc_api import fetch_kraken_ohlc
    ```
 ---
 
 ### Installing from TestPyPI
    ```bash
-   pip install --extra-index-url https://test.pypi.org/simple/ amla-at1==2025.0.2.0
+   pip install --extra-index-url https://test.pypi.org/simple/ amla-at1==2025.0.3.1
    ```
 ---
 
@@ -138,3 +151,5 @@ amla_at1_python_pkg/
 
 ### Attribution
 - [Open-Meteo Historical Weather API](https://open-meteo.com/en/docs/historical-weather-api#json_return_object)
+- [Coin OHLC Chart by ID - CoinGecko API](https://docs.coingecko.com/v3.0.1/reference/coins-id-ohlc)
+- [Get OHLC Data | Kraken API Center](https://docs.kraken.com/api/docs/rest-api/get-ohlc-data/)
