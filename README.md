@@ -5,7 +5,7 @@
 </a>
 
 ## Project description
-`amla_at1` is a lightweight Python package that bundles **data utilities**, **feature-engineering helpers**, **baseline models**, and **evaluation helpers**. It includes:
+This repo is a lightweight Python package that bundles **data utilities**, **feature-engineering helpers**, **baseline models**, and **evaluation helpers**. It includes:
 - **Data utils**: train/val/test splits, date-based splits, save/load sets.
 - **Weather I/O**: Open-Meteo historical API wrapper for Sydney
 - **Crypto utilities**: Fetches the latest Ethereum OHLC data from Kraken / CoinGecko, prepares historical/engineered features, builds supervised data to predict next_day_high.
